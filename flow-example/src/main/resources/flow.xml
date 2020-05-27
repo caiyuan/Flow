@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applicationConfig>
+
+    <tf id="ftp" class="me.caiyuan.flow.test.data.ftp.FtpFlow">
+        <plugins>
+            <plugin>file</plugin>
+        </plugins>
+    </tf>
+
+    <tf id="file" class="me.caiyuan.flow.test.data.file.FileFlow" lazy="true">
+        <plugin>out</plugin>
+        <config>fileFlow.xml</config>
+    </tf>
+
+    <tf id="out" class="me.caiyuan.flow.test.data.out.OutFlow" lazy="true">
+        <property name="dataSource">dataSource</property>
+    </tf>
+
+</applicationConfig>

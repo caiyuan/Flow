@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applicationConfig start="ftp">
+
+    <import resource="flow.xml"/>
+
+    <import resource="bean.xml"/>
+
+    <argument id="argument" class="me.caiyuan.flow.FlowArgument">
+        <config>argumentConfig.xml</config>
+    </argument>
+
+</applicationConfig>
