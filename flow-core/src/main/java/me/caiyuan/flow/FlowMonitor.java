@@ -12,8 +12,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class FlowMonitor {
 
     final static ThreadGroup APP_THREADS = new ThreadGroup("APP_THREADS");
-    final static Map<String, FlowState> flowState = new HashMap<String, FlowState>();
-    final static Map<String, List<Object[]>> monitorPool = new LinkedHashMap<String, List<Object[]>>();
+    final static Map<String, FlowState> flowState = new HashMap<>();
+    final static Map<String, List<Object[]>> monitorPool = new LinkedHashMap<>();
     private static final Logger log = Logger.getLogger(FlowMonitor.class);
     /**
      * 是否为显示数据池数据量信息
@@ -28,11 +28,7 @@ public class FlowMonitor {
      * @param pool   关联的数据池
      */
     static void monitor(String id, String plugin, FlowPool pool) {
-        List<Object[]> pools = monitorPool.get(plugin);
-        if (pools == null) {
-            pools = new ArrayList<Object[]>();
-            monitorPool.put(plugin, pools);
-        }
+        List<Object[]> pools = monitorPool.computeIfAbsent(plugin, k -> new ArrayList<>());
         pools.add(new Object[]{id, pool});
     }
 
@@ -40,7 +36,7 @@ public class FlowMonitor {
      * 获取依赖的所有上游组件(包含上游的上游组件)
      */
     private static Set<String> depend(FlowConfig tc, List<FlowConfig> flowConfigs) {
-        Set<String> depend = new HashSet<String>();
+        Set<String> depend = new HashSet<>();
         String id = tc.getId();
         for (FlowConfig config : flowConfigs) {
             Set<String> pluginList = config.getPluginList();
@@ -64,7 +60,7 @@ public class FlowMonitor {
             Flow flow = flowList.get(id);
             ThreadGroup procThreads = flow.procThreads;
             Set<String> dependFlowAll = depend(config, flowConfigs);
-            flowState.put(id, new FlowState(id, flow, procThreads, dependFlowAll.toArray(new String[dependFlowAll.size()])));
+            flowState.put(id, new FlowState(id, flow, procThreads, dependFlowAll.toArray(new String[0])));
         }
 
         new Thread(new Runnable() {
@@ -151,8 +147,6 @@ public class FlowMonitor {
                                             monitor.append("B");
                                             break;
                                         case WAITING:
-                                            monitor.append("W");
-                                            break;
                                         case TIMED_WAITING:
                                             monitor.append("W");
                                             break;
@@ -189,14 +183,11 @@ public class FlowMonitor {
 
                                 flowState.finish = false;
                                 final Flow tf = flowState.flow;
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            tf.finish();
-                                        } catch (Exception e) {
-                                            log.error("AppMonitor", e);
-                                        }
+                                new Thread(() -> {
+                                    try {
+                                        tf.finish();
+                                    } catch (Exception e) {
+                                        log.error("AppMonitor", e);
                                     }
                                 }, tf.id + "#finish").start();
                             }

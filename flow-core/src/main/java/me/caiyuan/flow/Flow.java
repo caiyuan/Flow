@@ -20,7 +20,7 @@ public abstract class Flow extends FlowInit {
     protected final ThreadGroup procThreads;
     final ReentrantLock INIT_LOCK = new ReentrantLock();
     /**
-     * 从上游到该组件的数据推
+     * 从上游到该组件的 DataPush
      */
     final ConcurrentHashMap<String, FlowPush> pushLeft;
     volatile Init init = Init.NEW;        // 初始化状态
@@ -34,7 +34,7 @@ public abstract class Flow extends FlowInit {
         super(id, param);
         this.handle = new FlowHandle(FlowInvalid.class);
         this.procThreads = new ThreadGroup(FlowMonitor.APP_THREADS, id);
-        this.pushLeft = new ConcurrentHashMap<String, FlowPush>();
+        this.pushLeft = new ConcurrentHashMap<>();
     }
 
     /**
@@ -46,7 +46,7 @@ public abstract class Flow extends FlowInit {
         super(id, param);
         this.handle = new FlowHandle(clz);
         this.procThreads = new ThreadGroup(FlowMonitor.APP_THREADS, id);
-        this.pushLeft = new ConcurrentHashMap<String, FlowPush>();
+        this.pushLeft = new ConcurrentHashMap<>();
     }
 
 
@@ -60,7 +60,7 @@ public abstract class Flow extends FlowInit {
         super(id, param);
         this.handle = new FlowHandle(clz, timeout);
         this.procThreads = new ThreadGroup(FlowMonitor.APP_THREADS, id);
-        this.pushLeft = new ConcurrentHashMap<String, FlowPush>();
+        this.pushLeft = new ConcurrentHashMap<>();
     }
 
     /**
@@ -73,7 +73,7 @@ public abstract class Flow extends FlowInit {
         super(id, param);
         this.handle = new FlowHandle(clz, harmony);
         this.procThreads = new ThreadGroup(FlowMonitor.APP_THREADS, id);
-        this.pushLeft = new ConcurrentHashMap<String, FlowPush>();
+        this.pushLeft = new ConcurrentHashMap<>();
     }
 
     /**
@@ -87,7 +87,7 @@ public abstract class Flow extends FlowInit {
         super(id, param);
         this.handle = new FlowHandle(clz, harmony, timeout);
         this.procThreads = new ThreadGroup(FlowMonitor.APP_THREADS, id);
-        this.pushLeft = new ConcurrentHashMap<String, FlowPush>();
+        this.pushLeft = new ConcurrentHashMap<>();
     }
 
     final void register(Flow plugin) throws Exception {
@@ -98,7 +98,7 @@ public abstract class Flow extends FlowInit {
      * 用于组件内部的初始化
      */
     @Override
-    public void init() throws Exception {
+    public void init() {
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class Flow extends FlowInit {
     /**
      * 本方法全部上游组件及本组件执行完毕时有框架调度执行
      */
-    public void finish() throws Exception {
+    public void finish() {
     }
 
     enum Init {

@@ -38,26 +38,23 @@ public class FlowPush extends Thread {
         if (state == State.TIMED_WAITING) {
             notifyAll();
         } else if (state == State.NEW) {
-            logger.debug("启动数据推 " + getName());
+            logger.debug("启动 DataPush " + getName());
             start();
         } else if (state == State.TERMINATED) {
-            throw new IllegalThreadStateException("数据推已退出 " + getName());
+            throw new IllegalThreadStateException(" DataPush已退出 " + getName());
         }
     }
 
     @Override
     public void run() {
-        logger.debug("进入数据推 " + getName());
+        logger.debug("进入 DataPush " + getName());
         try {
             byte detection = -1;
             while (true) {
                 Object data;
                 while ((data = pool.poll()) != null) {
                     detection = 0;
-                    if (plugin.init == FINISH) {
-                        plugin.state = Process.RUNNABLE;
-                        plugin.process(data);
-                    } else {
+                    if (plugin.init != FINISH) {
                         ReentrantLock lock = plugin.INIT_LOCK;
                         lock.lock();
                         try {
@@ -70,27 +67,28 @@ public class FlowPush extends Thread {
                         } finally {
                             lock.unlock();
                         }
-                        plugin.state = Process.RUNNABLE;
-                        plugin.process(data);
                     }
+                    plugin.state = Process.RUNNABLE;
+                    plugin.process(data);
                 }
                 synchronized (this) {
                     if (detection == 1 &&
-                            (tf.state == Process.TERMINATED || tf.state == Process.START))
+                            (tf.state == Process.TERMINATED || tf.state == Process.START)) {
                         break;
+                    }
                     plugin.state = Process.WAITING;
                     wait(timeout);
                     detection = 1;
                 }
             }
 
-            logger.debug("数据推退出 " + getName());
+            logger.debug(" DataPush退出 " + getName());
 
         } catch (InterruptedException e) {
-            logger.error("数据推异常退出,重新进入 " + getName(), e);
+            logger.error(" DataPush异常退出,重新进入 " + getName(), e);
             run();
         } catch (Exception e) {
-            logger.error("数据推异常退出 " + getName(), e);
+            logger.error(" DataPush异常退出 " + getName(), e);
             System.exit(1);
         } finally {
             plugin.state = Process.TERMINATED;

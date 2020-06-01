@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class FlowApp {
 
-    private static Logger logger = Logger.getLogger(FlowApp.class);
+    private static final Logger logger = Logger.getLogger(FlowApp.class);
 
     public static void main(final String[] args) throws Exception {
 
@@ -43,15 +43,14 @@ public class FlowApp {
         logger.info("& 初始化 Bean 组件 ..");
         List<FlowConfig> beanConfigs = applicationConfig.get(FlowConfig.Type.Bean);
         Map<String, FlowBean> beanList = getInstance(beanConfigs, argument);
-        module = new HashMap<String, Object>();
-        module.putAll(beanList);
+        module = new HashMap<>(beanList);
         inject(beanConfigs, module);
         init(beanConfigs, beanList);
 
         logger.info("& 初始化 Flow 组件 ..");
         List<FlowConfig> tfConfigs = applicationConfig.get(FlowConfig.Type.Flow);
         Map<String, Flow> flowList = getInstance(tfConfigs, argument);
-        module = new HashMap<String, Object>();
+        module = new HashMap<>();
         module.putAll(beanList);
         module.putAll(flowList);
         inject(tfConfigs, module);
@@ -69,7 +68,7 @@ public class FlowApp {
     }
 
     private static Map<String, String> argument(Map<String, FlowArgument> argumentList) throws Exception {
-        Map<String, String> argument = new HashMap<String, String>();
+        Map<String, String> argument = new HashMap<>();
         for (FlowArgument flowArgument : argumentList.values()) {
             Map<String, String> values = flowArgument.process();
             if (values != null) argument.putAll(values);
@@ -78,7 +77,7 @@ public class FlowApp {
     }
 
     private static <T extends FlowConstructor> Map<String, T> getInstance(List<FlowConfig> flowConfigs, Map<String, String> argument) throws Exception {
-        Map<String, T> result = new TreeMap<String, T>();
+        Map<String, T> result = new TreeMap<>();
         for (FlowConfig flowConfig : flowConfigs) {
             logger.info("create : " + flowConfig.getId() + " # " + flowConfig.getClz());
             FlowParameter param = new FlowParameter(argument);
@@ -119,8 +118,8 @@ public class FlowApp {
     }
 
     private static void init(List<FlowConfig> flowConfigs, Map<String, ? extends FlowInit> flowList) throws Exception {
-        List<FlowConfig> beans = new ArrayList<FlowConfig>();
-        List<FlowConfig> tfs = new ArrayList<FlowConfig>();
+        List<FlowConfig> beans = new ArrayList<>();
+        List<FlowConfig> tfs = new ArrayList<>();
         for (FlowConfig config : flowConfigs) {
             if (FlowConfig.Type.Bean.equals(config.getType())) {
                 beans.add(config);
@@ -144,22 +143,20 @@ public class FlowApp {
                     continue;
                 }
 
-                new Thread(new Runnable() {
-                    public void run() {
-                        lock.lock();
-                        try {
-                            if (flow.init != Flow.Init.LAZY && flow.init != Flow.Init.FINISH) {
-                                logger.info("init : " + flow.id);
-                                flow.init = Flow.Init.UNDERWAY;
-                                flow.init();
-                                flow.init = Flow.Init.FINISH;
-                            }
-                        } catch (Exception e) {
-                            logger.error("初始化失败: " + flow.id, e);
-                            System.exit(1);
-                        } finally {
-                            lock.unlock();
+                new Thread(() -> {
+                    lock.lock();
+                    try {
+                        if (flow.init != Flow.Init.LAZY && flow.init != Flow.Init.FINISH) {
+                            logger.info("init : " + flow.id);
+                            flow.init = Flow.Init.UNDERWAY;
+                            flow.init();
+                            flow.init = Flow.Init.FINISH;
                         }
+                    } catch (Exception e) {
+                        logger.error("初始化失败: " + flow.id, e);
+                        System.exit(1);
+                    } finally {
+                        lock.unlock();
                     }
                 }, flow.id + "#init").start();
 
@@ -176,7 +173,9 @@ public class FlowApp {
                 for (String pid : config.getPluginList()) {
                     logger.info("register : " + config.getId() + " <-- " + pid);
                     Flow plugin = flowList.get(pid);
-                    if (pid == null) throw new Exception("未知的 Flow 组件 : " + pid);
+                    if (plugin == null) {
+                        throw new Exception("未知的 Flow 组件 : " + pid);
+                    }
                     flow.register(plugin);
                 }
             }
@@ -185,17 +184,16 @@ public class FlowApp {
 
     private static void start(String start, Map<String, Flow> flowList) throws Exception {
         final Flow main = flowList.get(start);
-        if (main == null) throw new Exception("未知的 Flow 组件 : " + start);
-        new Thread(main.procThreads, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    main.state = Flow.Process.START;
-                    main.process("null");
-                } catch (Exception e) {
-                    logger.error("App Error : ", e);
-                    System.exit(1);
-                }
+        if (main == null) {
+            throw new Exception("未知的 Flow 组件 : " + start);
+        }
+        new Thread(main.procThreads, () -> {
+            try {
+                main.state = Flow.Process.START;
+                main.process("null");
+            } catch (Exception e) {
+                logger.error("App Error : ", e);
+                System.exit(1);
             }
         }, main.id + " <== appStart").start();
     }

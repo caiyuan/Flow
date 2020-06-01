@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class DataSource extends FlowBean {
 
-    private DSConfig dsConfigs;
+    private final DSConfig dsConfigs;
 
     public DataSource(String id, FlowParameter param) {
         super(id, param);
@@ -47,7 +47,7 @@ public class DataSource extends FlowBean {
 
         private static DSConfig parse(FlowParameter param) {
             List<XML> prop = param.getTags("property");
-            Map<String, String> values = new HashMap<String, String>();
+            Map<String, String> values = new HashMap<>();
             for (XML xml : prop) {
                 String name = xml.getAttribute("name");
                 String value = xml.getText();

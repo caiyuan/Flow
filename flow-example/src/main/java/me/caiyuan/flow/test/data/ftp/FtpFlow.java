@@ -30,22 +30,19 @@ public class FtpFlow extends Flow {
             e.printStackTrace();
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<String> fileList = new ArrayList<String>();
-                fileList.add("/Users/Ryan/Documents/workspace/Flow/flow-example/vendor/data.txt");
-                fileList.add("/Users/Ryan/Documents/workspace/Flow/flow-example/vendor/data.txt");
-                fileList.add("/Users/Ryan/Documents/workspace/Flow/flow-example/vendor/data.txt");
+        new Thread(() -> {
+            List<String> fileList = new ArrayList<>();
+            fileList.add("/Users/Ryan/Documents/workspace/Flow/flow-example/vendor/data.txt");
+            fileList.add("/Users/Ryan/Documents/workspace/Flow/flow-example/vendor/data.txt");
+            fileList.add("/Users/Ryan/Documents/workspace/Flow/flow-example/vendor/data.txt");
 
-                for (final String file : fileList) {
-                    // handle.push(file, "fileFlow1");
-                    handle.push(file);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            for (final String file : fileList) {
+                // handle.push(file, "fileFlow1");
+                handle.push(file);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }, id + "#test").start();
@@ -53,7 +50,7 @@ public class FtpFlow extends Flow {
     }
 
     @Override
-    public void finish() throws Exception {
+    public void finish() {
         System.out.println(id + " --> finish");
     }
 

@@ -9,19 +9,19 @@ import java.util.Map;
 public class FlowUtil {
 
     public static Map<String, String> map(String[] args) {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
         String key = "";
-        String value = "";
+        StringBuilder value = new StringBuilder();
         for (String arg : args) {
             if (arg.indexOf("-") == 0) {
-                result.put(key, value);
+                result.put(key, value.toString());
                 key = arg.replaceFirst("-", "");
-                value = "";
+                value = new StringBuilder();
             } else {
-                value = value + (value.equals("") ? "" : " ") + arg;
+                value.append(value.toString().equals("") ? "" : " ").append(arg);
             }
         }
-        result.put(key, value);
+        result.put(key, value.toString());
         result.remove("");
         return result;
     }

@@ -16,7 +16,7 @@ public class FlowDistribute extends Flow {
     }
 
     @Override
-    public void process(Object o) throws Exception {
+    public void process(Object o) {
         handle.push(o, true);
     }
 

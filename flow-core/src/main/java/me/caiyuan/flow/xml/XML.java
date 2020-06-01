@@ -7,12 +7,11 @@ import java.util.*;
  */
 public class XML {
 
+    private final Map<String, String> attributes = new HashMap<>();
+    private final List<XML> childes = new ArrayList<>();
     private Map<String, List<XML>> index;
-
     private String node = null;
     private String text = null;
-    private Map<String, String> attributes = new HashMap<String, String>();
-    private List<XML> childes = new ArrayList<XML>();
     private XML father = null;
 
     public XML() {
@@ -85,7 +84,7 @@ public class XML {
      */
     public Map<String, List<XML>> index(boolean again) {
         if (index == null || again) {
-            index = new HashMap<String, List<XML>>();
+            index = new HashMap<>();
             build(this);
         }
         return index;
@@ -97,7 +96,7 @@ public class XML {
             String key = node.getNode();
             List<XML> value = index.get(key);
             if (value == null) {
-                List<XML> item = new ArrayList<XML>();
+                List<XML> item = new ArrayList<>();
                 index.put(key, item);
                 item.add(node);
             } else {

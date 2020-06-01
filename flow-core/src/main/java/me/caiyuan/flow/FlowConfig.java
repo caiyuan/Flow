@@ -12,14 +12,14 @@ import java.util.*;
  */
 public class FlowConfig {
 
-    private static Logger logger = Logger.getLogger(FlowConfig.class);
-    private String id;
-    private String clz;
+    private static final Logger logger = Logger.getLogger(FlowConfig.class);
+    private final String id;
+    private final String clz;
+    private final Set<String> configList;
+    private final Set<String> pluginList;
+    private final Map<String, String> beanMap;
+    private final Type type;
     private boolean lazy;
-    private Set<String> configList;
-    private Set<String> pluginList;
-    private Map<String, String> beanMap;
-    private Type type;
 
     private FlowConfig(String id, String clz, boolean lazy, Set<String> configList, Set<String> pluginList, Map<String, String> beanMap, Type type) {
         this.id = id;
@@ -38,16 +38,16 @@ public class FlowConfig {
     }
 
     private static Map<Type, List<FlowConfig>> sortByDependent(Map<String, FlowConfig> flowConfigMap) {
-        LinkedList<String> indexing = new LinkedList<String>(flowConfigMap.keySet());
+        LinkedList<String> indexing = new LinkedList<>(flowConfigMap.keySet());
 
-        List<FlowConfig> items = new ArrayList<FlowConfig>(flowConfigMap.values());
+        List<FlowConfig> items = new ArrayList<>(flowConfigMap.values());
         for (int i = items.size() - 1; i > 0; i--) {
             items.add(items.get(i));
         }
 
         for (FlowConfig config : items) {
             String id = config.id;
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
             list.addAll(config.pluginList);
             list.addAll(config.beanMap.values());
 
@@ -61,9 +61,9 @@ public class FlowConfig {
             indexing.add(index, id);
         }
 
-        List<FlowConfig> valueConfigs = new LinkedList<FlowConfig>();
-        List<FlowConfig> beanConfigs = new LinkedList<FlowConfig>();
-        List<FlowConfig> tfConfigs = new LinkedList<FlowConfig>();
+        List<FlowConfig> valueConfigs = new LinkedList<>();
+        List<FlowConfig> beanConfigs = new LinkedList<>();
+        List<FlowConfig> tfConfigs = new LinkedList<>();
 
         for (String id : indexing) {
             FlowConfig config = flowConfigMap.get(id);
@@ -72,7 +72,7 @@ public class FlowConfig {
             if (Type.Argument.equals(config.type)) valueConfigs.add(config);
         }
 
-        Map<Type, List<FlowConfig>> flowConfigs = new HashMap<Type, List<FlowConfig>>();
+        Map<Type, List<FlowConfig>> flowConfigs = new HashMap<>();
         flowConfigs.put(Type.Argument, valueConfigs);
         flowConfigs.put(Type.Bean, beanConfigs);
         flowConfigs.put(Type.Flow, tfConfigs);
@@ -87,9 +87,9 @@ public class FlowConfig {
      * 3. bean 不允许懒初始化
      * </pre>
      */
-    private static Map<String, FlowConfig> validate(Map<String, FlowConfig> flowConfigMap) throws Exception {
+    private static Map<String, FlowConfig> validate(Map<String, FlowConfig> flowConfigMap) {
         for (FlowConfig config : flowConfigMap.values()) {
-            Set<String> del = new HashSet<String>();
+            Set<String> del = new HashSet<>();
             // plugin
             if (Type.Flow.equals(config.type)) {
                 for (String name : config.pluginList) {
@@ -150,7 +150,7 @@ public class FlowConfig {
     private static Map<String, FlowConfig> parser(String applicationConfigPath) throws Exception {
         XML applicationConfig = XMLParse.parse(applicationConfigPath);
         Map<String, List<XML>> flowMap = applicationConfig.index();
-        List<XML> applicationXml = new ArrayList<XML>();
+        List<XML> applicationXml = new ArrayList<>();
         List<XML> tfList = flowMap.get("tf");
         if (tfList != null) applicationXml.addAll(tfList);
         List<XML> beanList = flowMap.get("bean");
@@ -172,7 +172,7 @@ public class FlowConfig {
     }
 
     private static Map<String, FlowConfig> toFlowConfig(List<XML> applicationXml) {
-        Map<String, FlowConfig> flowConfigMap = new HashMap<String, FlowConfig>();
+        Map<String, FlowConfig> flowConfigMap = new HashMap<>();
         if (applicationXml == null) {
             return flowConfigMap;
         }
@@ -197,7 +197,7 @@ public class FlowConfig {
     }
 
     private static Set<String> list(List<XML> xmlList) {
-        Set<String> strList = new HashSet<String>();
+        Set<String> strList = new HashSet<>();
         if (xmlList != null)
             for (XML xml : xmlList) {
                 String text = xml.getText();
@@ -207,7 +207,7 @@ public class FlowConfig {
     }
 
     private static Map<String, String> map(List<XML> property) {
-        Map<String, String> propMap = new HashMap<String, String>();
+        Map<String, String> propMap = new HashMap<>();
         if (property != null) {
             for (XML xml : property) {
                 String key = xml.getAttribute("name");

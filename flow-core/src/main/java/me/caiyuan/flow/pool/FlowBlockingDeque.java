@@ -12,16 +12,17 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class FlowBlockingDeque<T> implements FlowPool<T> {
 
+    private final Logger log = Logger.getLogger(FlowBlockingDeque.class);
+
     private final AtomicLong total = new AtomicLong();
     private final BlockingDeque<T> resultSet;
-    private Logger log = Logger.getLogger(FlowBlockingDeque.class);
 
     public FlowBlockingDeque() {
-        this.resultSet = new LinkedBlockingDeque<T>(5120);
+        this.resultSet = new LinkedBlockingDeque<>(5120);
     }
 
     public FlowBlockingDeque(int size) {
-        this.resultSet = new LinkedBlockingDeque<T>(size);
+        this.resultSet = new LinkedBlockingDeque<>(size);
     }
 
     @Override

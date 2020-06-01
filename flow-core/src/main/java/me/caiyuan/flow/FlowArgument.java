@@ -18,11 +18,11 @@ public class FlowArgument extends FlowConstructor {
     /**
      * 读入argument配置和命令行参数,如果命令行和argument配置有相同参数则采用命令行为准
      */
-    public Map<String, String> process() throws Exception {
-        Map<String, String> argument = new HashMap<String, String>();
+    public Map<String, String> process() {
+        Map<String, String> argument = new HashMap<>();
         Map<String, String> args = param.getArgs();
 
-        Map<String, String> values = new HashMap<String, String>();
+        Map<String, String> values = new HashMap<>();
         List<XML> argumentList = param.getTags("argument");
         if (argumentList != null)
             for (XML xml : argumentList) {

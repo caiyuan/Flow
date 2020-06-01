@@ -13,10 +13,10 @@ import java.util.Map;
  */
 public class FlowParameter {
 
-    protected XML xmlConfig = new XML("__root");
-    protected Map<String, String> argument = new HashMap<String, String>();
-    private Logger logger = Logger.getLogger(FlowParameter.class);
-    private Map<String, List<XML>> xmlIndex = new HashMap<String, List<XML>>();
+    protected final XML xmlConfig = new XML("__root");
+    protected final Map<String, String> argument = new HashMap<>();
+    private final Logger logger = Logger.getLogger(FlowParameter.class);
+    private Map<String, List<XML>> xmlIndex = new HashMap<>();
 
     public FlowParameter(Map<String, String> args) {
         if (args != null) this.argument.putAll(args);

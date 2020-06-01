@@ -5,7 +5,6 @@ import me.caiyuan.flow.FlowParameter;
 import me.caiyuan.flow.test.pool.ObjectPool;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -22,15 +21,12 @@ public class FileFlow extends Flow {
     }
 
     @Override
-    public void init() throws Exception {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    public void init() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }, "file!init!thread").start();
 
@@ -48,15 +44,12 @@ public class FileFlow extends Flow {
             int count = 0;
             while ((line = reader.readLine()) != null) {
                 final String[] data = line.split(fileConfig.separator);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        handle.push(data, true);
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                new Thread(() -> {
+                    handle.push(data, true);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }, id + "#test" + ++count).start();
 
@@ -67,8 +60,6 @@ public class FileFlow extends Flow {
 //                }
 
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,7 +67,7 @@ public class FileFlow extends Flow {
 
 
     @Override
-    public void finish() throws Exception {
+    public void finish() {
         System.out.println(id + " --> finish");
     }
 

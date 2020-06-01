@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 public class OutFlow extends Flow {
 
-    private Logger log = Logger.getLogger(this.getClass());
+    private final Logger log = Logger.getLogger(this.getClass());
     private DataSource dataSource;
 
     public OutFlow(String id, FlowParameter parameter) {

@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
  */
 public class XMLParse {
 
+    @SafeVarargs
     public static XML parse(String xml, Map<String, String>... argument) throws XMLParseException {
         try {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -35,11 +36,7 @@ public class XMLParse {
             Element element = document.getDocumentElement();
             return traverse(element);
 
-        } catch (ParserConfigurationException e) {
-            throw new XMLParseException(e);
-        } catch (SAXException e) {
-            throw new XMLParseException(e);
-        } catch (IOException e) {
+        } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new XMLParseException(e);
         }
     }
@@ -53,7 +50,7 @@ public class XMLParse {
         }
         String body = builder.toString();
 
-        Pattern p = Pattern.compile("\\$\\{[^}]+\\}?");
+        Pattern p = Pattern.compile("\\$\\{[^}]+}?");
         Matcher m = p.matcher(body);
 
         StringBuilder content = new StringBuilder();
@@ -64,14 +61,16 @@ public class XMLParse {
             int end = m.end();
 
             String key = group.substring(2, group.length() - 1);
-            content.append(body.substring(begin, start));
+            content.append(body, begin, start);
             String value = values.get(key);
-            if (value == null) value = group;
+            if (value == null) {
+                value = group;
+            }
             content.append(value);
             begin = end;
         }
         int end = body.length();
-        content.append(body.substring(begin, end));
+        content.append(body, begin, end);
 
         return new ByteArrayInputStream(content.toString().getBytes());
     }

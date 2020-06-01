@@ -14,30 +14,30 @@ public class FlowHandle {
     private final ReentrantLock lock = new ReentrantLock();
     private final List<FlowMap> pushList;
     private final Class<? extends FlowPool> clz;
-    private Logger log = Logger.getLogger(FlowHandle.class);
+    private final Logger log = Logger.getLogger(FlowHandle.class);
     private FlowPool pool;
     private boolean harmony = false;
     private long timeout = 5 * 1000;
     /**
-     * 下一个接受数据推送的组件的位置
+     * 下一个接受 DataPush送的组件的位置
      */
     private int flag = 0;
 
     FlowHandle(Class<? extends FlowPool> clz) {
         this.clz = clz;
-        this.pushList = new CopyOnWriteArrayList<FlowMap>();
+        this.pushList = new CopyOnWriteArrayList<>();
     }
 
     FlowHandle(Class<? extends FlowPool> clz, boolean harmony) {
         this.clz = clz;
         this.harmony = harmony;
-        this.pushList = new CopyOnWriteArrayList<FlowMap>();
+        this.pushList = new CopyOnWriteArrayList<>();
     }
 
     public FlowHandle(Class<? extends FlowPool> clz, long timeout) {
         this.clz = clz;
         if (timeout > 0) this.timeout = timeout;
-        this.pushList = new CopyOnWriteArrayList<FlowMap>();
+        this.pushList = new CopyOnWriteArrayList<>();
     }
 
 
@@ -45,7 +45,7 @@ public class FlowHandle {
         this.clz = clz;
         this.harmony = harmony;
         if (timeout > 0) this.timeout = timeout;
-        this.pushList = new CopyOnWriteArrayList<FlowMap>();
+        this.pushList = new CopyOnWriteArrayList<>();
     }
 
     void plugin(Flow tf, Flow plugin) throws Exception {
@@ -61,7 +61,7 @@ public class FlowHandle {
             flowMap.push.keepStart();
             active = flowMap;
         } catch (IllegalThreadStateException e) {
-            log.debug("重启数据推 " + flowMap.push.getName());
+            log.debug("重启 DataPush " + flowMap.push.getName());
             FlowMap duplicate = flowMap.duplicate();
             duplicate.push.keepStart();
             int index = pushList.indexOf(flowMap);
@@ -132,7 +132,7 @@ public class FlowHandle {
         }
     }
 
-    private class FlowMap {
+    private static class FlowMap {
         private final Flow plugin;
         private final FlowPush push;
         private boolean initial = false;
